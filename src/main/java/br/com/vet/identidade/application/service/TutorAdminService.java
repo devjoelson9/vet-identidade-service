@@ -1,5 +1,6 @@
 package br.com.vet.identidade.application.service;
 
+import br.com.vet.identidade.application.dto.response.TutorResponseDTO;
 import br.com.vet.identidade.application.exception.ResourceNotFoundException;
 import br.com.vet.identidade.domain.enums.StatusUsuario;
 import br.com.vet.identidade.domain.model.Tutor;
@@ -9,6 +10,8 @@ import br.com.vet.identidade.domain.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -25,29 +28,32 @@ public class TutorAdminService {
 
         Usuario usuario = tutor.getUsuario();
         usuario.setStatus(StatusUsuario.DESATIVADO);
-        usuario.setDeletadoEm(java.time.LocalDateTime.now());
+        usuario.setDeletadoEm(LocalDateTime.now());
         usuarioRepository.save(usuario);
 
-        tutor.setDeletadoEm(java.time.LocalDateTime.now());
+        tutor.setDeletadoEm(LocalDateTime.now());
         tutorRepository.save(tutor);
     }
 
     @Transactional(readOnly = true)
-    public Tutor buscarTutorAtivo(Long tutorId) {
-        return tutorRepository.findByIdAndDeletadoEmIsNull(tutorId)
+    public TutorResponseDTO buscarTutorAtivo(Long tutorId) {
+        Tutor tutor = tutorRepository.findByIdAndDeletadoEmIsNull(tutorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutor não encontrado: " + tutorId));
+        return toDTO(tutor);
     }
 
     @Transactional(readOnly = true)
-    public Tutor buscarTutorDesativado(Long tutorId) {
-        return tutorRepository.findById(tutorId)
-                .filter(t -> t.getDeletadoEm() != null)
-                .orElseThrow(() -> new ResourceNotFoundException("Tutor desativado não encontrado: " + tutorId));
+    public TutorResponseDTO buscarTutorPorId(Long tutorId) {
+        Tutor tutor = tutorRepository.findById(tutorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tutor não encontrado: " + tutorId));
+        return toDTO(tutor);
     }
 
     @Transactional
-    public void reativarTutor(Long tutorId) {
-        Tutor tutor = buscarTutorDesativado(tutorId);
+    public TutorResponseDTO reativarTutor(Long tutorId) {
+        Tutor tutor = tutorRepository.findById(tutorId)
+                .filter(t -> t.getDeletadoEm() != null)
+                .orElseThrow(() -> new ResourceNotFoundException("Tutor desativado não encontrado: " + tutorId));
 
         Usuario usuario = tutor.getUsuario();
         usuario.setStatus(StatusUsuario.ATIVO);
@@ -56,5 +62,22 @@ public class TutorAdminService {
 
         tutor.setDeletadoEm(null);
         tutorRepository.save(tutor);
+
+        return toDTO(tutor);
+    }
+
+    private TutorResponseDTO toDTO(Tutor tutor) {
+        Usuario u = tutor.getUsuario();
+        return new TutorResponseDTO(
+                tutor.getId(),
+                u.getId(),
+                u.getNomeCompleto(),
+                u.getEmail(),
+                u.getCpf(),
+                u.getTelefone(),
+                tutor.getEndereco(),
+                u.getStatus().name(),
+                tutor.getDeletadoEm()
+        );
     }
 }

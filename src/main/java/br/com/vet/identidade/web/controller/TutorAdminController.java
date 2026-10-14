@@ -1,5 +1,6 @@
 package br.com.vet.identidade.web.controller;
 
+import br.com.vet.identidade.application.dto.response.TutorResponseDTO;
 import br.com.vet.identidade.application.service.TutorAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,34 +22,14 @@ public class TutorAdminController {
     }
 
     @PatchMapping("/{id}/reativar")
-    public ResponseEntity<Void> reativar(@PathVariable Long id) {
-        service.reativarTutor(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<TutorResponseDTO> reativar(@PathVariable Long id) {
+        TutorResponseDTO tutor = service.reativarTutor(id);
+        return ResponseEntity.ok(tutor);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TutorResponse> buscar(@PathVariable Long id) {
-        var tutor = service.buscarTutorAtivo(id);
-        return ResponseEntity.ok(new TutorResponse(
-                tutor.getId(),
-                tutor.getUsuario().getId(),
-                tutor.getUsuario().getNomeCompleto(),
-                tutor.getUsuario().getEmail(),
-                tutor.getUsuario().getCpf(),
-                tutor.getUsuario().getTelefone(),
-                tutor.getEndereco(),
-                tutor.getUsuario().getStatus().name()
-        ));
+    public ResponseEntity<TutorResponseDTO> buscar(@PathVariable Long id) {
+        TutorResponseDTO tutor = service.buscarTutorPorId(id);
+        return ResponseEntity.ok(tutor);
     }
-
-    public record TutorResponse(
-            Long id,
-            Long usuarioId,
-            String nomeCompleto,
-            String email,
-            String cpf,
-            String telefone,
-            String endereco,
-            String status
-    ) {}
 }
