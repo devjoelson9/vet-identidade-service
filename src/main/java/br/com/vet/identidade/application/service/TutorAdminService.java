@@ -2,6 +2,7 @@ package br.com.vet.identidade.application.service;
 
 import br.com.vet.identidade.application.dto.response.TutorResponseDTO;
 import br.com.vet.identidade.application.exception.ResourceNotFoundException;
+import br.com.vet.identidade.application.mapper.TutorMapper;
 import br.com.vet.identidade.domain.enums.StatusUsuario;
 import br.com.vet.identidade.domain.model.Tutor;
 import br.com.vet.identidade.domain.model.Usuario;
@@ -19,6 +20,7 @@ public class TutorAdminService {
 
     private final TutorRepository tutorRepository;
     private final UsuarioRepository usuarioRepository;
+    private final TutorMapper tutorMapper;
 
     @Transactional
     public void desativarTutor(Long tutorId) {
@@ -39,14 +41,14 @@ public class TutorAdminService {
     public TutorResponseDTO buscarTutorAtivo(Long tutorId) {
         Tutor tutor = tutorRepository.findByIdAndDeletadoEmIsNull(tutorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutor não encontrado: " + tutorId));
-        return toDTO(tutor);
+        return tutorMapper.toDTO(tutor);
     }
 
     @Transactional(readOnly = true)
     public TutorResponseDTO buscarTutorPorId(Long tutorId) {
         Tutor tutor = tutorRepository.findById(tutorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutor não encontrado: " + tutorId));
-        return toDTO(tutor);
+        return tutorMapper.toDTO(tutor);
     }
 
     @Transactional
@@ -63,21 +65,6 @@ public class TutorAdminService {
         tutor.setDeletadoEm(null);
         tutorRepository.save(tutor);
 
-        return toDTO(tutor);
-    }
-
-    private TutorResponseDTO toDTO(Tutor tutor) {
-        Usuario u = tutor.getUsuario();
-        return new TutorResponseDTO(
-                tutor.getId(),
-                u.getId(),
-                u.getNomeCompleto(),
-                u.getEmail(),
-                u.getCpf(),
-                u.getTelefone(),
-                tutor.getEndereco(),
-                u.getStatus().name(),
-                tutor.getDeletadoEm()
-        );
+        return tutorMapper.toDTO(tutor);
     }
 }
