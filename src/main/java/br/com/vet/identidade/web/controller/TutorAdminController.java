@@ -20,6 +20,12 @@ public class TutorAdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<Void> reativar(@PathVariable Long id) {
+        service.reativarTutor(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<TutorResponse> buscar(@PathVariable Long id) {
         var tutor = service.buscarTutorAtivo(id);

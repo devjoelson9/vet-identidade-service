@@ -37,4 +37,24 @@ public class TutorAdminService {
         return tutorRepository.findByIdAndDeletadoEmIsNull(tutorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutor não encontrado: " + tutorId));
     }
+
+    @Transactional(readOnly = true)
+    public Tutor buscarTutorDesativado(Long tutorId) {
+        return tutorRepository.findById(tutorId)
+                .filter(t -> t.getDeletadoEm() != null)
+                .orElseThrow(() -> new ResourceNotFoundException("Tutor desativado não encontrado: " + tutorId));
+    }
+
+    @Transactional
+    public void reativarTutor(Long tutorId) {
+        Tutor tutor = buscarTutorDesativado(tutorId);
+
+        Usuario usuario = tutor.getUsuario();
+        usuario.setStatus(StatusUsuario.ATIVO);
+        usuario.setDeletadoEm(null);
+        usuarioRepository.save(usuario);
+
+        tutor.setDeletadoEm(null);
+        tutorRepository.save(tutor);
+    }
 }
