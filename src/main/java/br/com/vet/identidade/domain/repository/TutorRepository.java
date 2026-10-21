@@ -12,6 +12,7 @@ public interface TutorRepository extends JpaRepository<Tutor, Long> {
     Optional<Tutor> findByUsuarioId(Long usuarioId);
     Optional<Tutor> findByUsuarioIdAndDeletadoEmIsNull(Long usuarioId);
     Optional<Tutor> findByIdAndDeletadoEmIsNull(Long id);
+    Optional<Tutor> findByUsuario_EmailAndDeletadoEmIsNull(String email);
     Page<Tutor> findByDeletadoEmIsNull(Pageable pageable);
 
     @Query("SELECT t FROM Tutor t JOIN t.usuario u WHERE t.deletadoEm IS NULL AND (" +
