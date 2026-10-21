@@ -1,6 +1,6 @@
 package br.com.vet.identidade.application.service;
 
-import br.com.vet.identidade.application.dto.request.RedfinirSenhaRequestDTO;
+import br.com.vet.identidade.application.dto.request.RedefinirSenhaRequestDTO;
 import br.com.vet.identidade.application.dto.request.SolicitarRecuperacaoSenhaRequestDTO;
 import br.com.vet.identidade.application.dto.response.RecuperacaoSenhaResponseDTO;
 import br.com.vet.identidade.application.exception.BusinessException;
