@@ -64,6 +64,15 @@ public class RecepcionistaTutorService {
     }
 
     @Transactional(readOnly = true)
+    public Page<TutorResponseDTO> buscarPorTermo(String termo, Pageable pageable) {
+        if (termo == null || termo.trim().isEmpty()) {
+            return listar(pageable);
+        }
+        return tutorRepository.buscarPorTermo(termo.trim(), pageable)
+                .map(tutorMapper::toDTO);
+    }
+
+    @Transactional(readOnly = true)
     public TutorResponseDTO buscarPorId(Long id) {
         Tutor tutor = tutorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutor não encontrado: " + id));
