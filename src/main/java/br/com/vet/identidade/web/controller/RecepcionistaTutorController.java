@@ -27,7 +27,13 @@ public class RecepcionistaTutorController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<TutorResponseDTO>> listar(@PageableDefault(size = 20, sort = "nomeCompleto") Pageable pageable) {
+    public ResponseEntity<Page<TutorResponseDTO>> listar(
+            @RequestParam(required = false) String termo,
+            @PageableDefault(size = 20, sort = "nomeCompleto") Pageable pageable
+    ) {
+        if (termo != null && !termo.trim().isEmpty()) {
+            return ResponseEntity.ok(service.buscarPorTermo(termo, pageable));
+        }
         return ResponseEntity.ok(service.listar(pageable));
     }
 
