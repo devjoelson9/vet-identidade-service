@@ -15,4 +15,14 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
     Page<Animal> findByTutorAndDeletadoEmIsNull(Tutor tutor, Pageable pageable);
     Optional<Animal> findByIdAndTutorAndDeletadoEmIsNull(Long id, Tutor tutor);
     Optional<Animal> findByIdAndDeletadoEmIsNull(Long id);
+
+    @Query("SELECT a FROM Animal a JOIN a.tutor t JOIN t.usuario u WHERE a.deletadoEm IS NULL AND (" +
+           "LOWER(a.nome) LIKE LOWER(CONCAT('%', :termo, '%')) OR " +
+           "LOWER(a.especie) LIKE LOWER(CONCAT('%', :termo, '%')) OR " +
+           "LOWER(a.raca) LIKE LOWER(CONCAT('%', :termo, '%')) OR " +
+           "LOWER(u.nomeCompleto) LIKE LOWER(CONCAT('%', :termo, '%')) OR " +
+           "u.cpf = :termo)")
+    Page<Animal> buscarPorTermo(String termo, Pageable pageable);
+
+    Page<Animal> findByDeletadoEmIsNull(Pageable pageable);
 }
