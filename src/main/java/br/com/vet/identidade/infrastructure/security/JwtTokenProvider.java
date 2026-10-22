@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,7 +35,9 @@ public class JwtTokenProvider {
     public String generateAccessToken(String email, Set<Role> roles) {
         Instant now = Instant.now();
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(email)
+                .claim("type", "access")
                 .claim("roles", roles.stream().map(Role::name).collect(Collectors.toSet()))
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(accessTokenExpirationMs)))
@@ -45,7 +48,9 @@ public class JwtTokenProvider {
     public String generateRefreshToken(String email) {
         Instant now = Instant.now();
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(email)
+                .claim("type", "refresh")
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(refreshTokenExpirationMs)))
                 .signWith(secretKey, Jwts.SIG.HS256) 
@@ -54,6 +59,23 @@ public class JwtTokenProvider {
 
     public String extractEmail(String token) {
         return parseClaims(token).getSubject();
+    }
+
+    public String extractJti(String token) {
+        return parseClaims(token).getId();
+    }
+
+    public Date extractExpiration(String token) {
+        return parseClaims(token).getExpiration();
+    }
+
+    public boolean isAccessToken(String token) {
+        String type = parseClaims(token).get("type", String.class);
+        return type == null || "access".equals(type);
+    }
+
+    public boolean isRefreshToken(String token) {
+        return "refresh".equals(parseClaims(token).get("type", String.class));
     }
 
     public Set<Role> extractRoles(String token) {
