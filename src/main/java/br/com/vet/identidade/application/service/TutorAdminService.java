@@ -9,6 +9,8 @@ import br.com.vet.identidade.domain.model.Usuario;
 import br.com.vet.identidade.domain.repository.TutorRepository;
 import br.com.vet.identidade.domain.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,17 @@ public class TutorAdminService {
     private final TutorRepository tutorRepository;
     private final UsuarioRepository usuarioRepository;
     private final TutorMapper tutorMapper;
+
+    @Transactional(readOnly = true)
+    public Page<TutorResponseDTO> listar(String termo, StatusUsuario status, Pageable pageable) {
+        String termoNormalizado = termo == null || termo.isBlank() ? null : termo.trim();
+
+        Page<Tutor> tutores = status == null
+                ? tutorRepository.buscarTodosParaAdmin(termoNormalizado, pageable)
+                : tutorRepository.buscarTodosParaAdminComStatus(termoNormalizado, status, pageable);
+
+        return tutores.map(tutorMapper::toDTO);
+    }
 
     @Transactional
     public void desativarTutor(Long tutorId) {
