@@ -4,7 +4,6 @@ import br.com.vet.identidade.application.dto.request.RedefinirSenhaRequestDTO;
 import br.com.vet.identidade.application.dto.request.SolicitarRecuperacaoSenhaRequestDTO;
 import br.com.vet.identidade.application.dto.response.RecuperacaoSenhaResponseDTO;
 import br.com.vet.identidade.application.exception.BusinessException;
-import br.com.vet.identidade.application.exception.ResourceNotFoundException;
 import br.com.vet.identidade.domain.model.PasswordResetToken;
 import br.com.vet.identidade.domain.model.Usuario;
 import br.com.vet.identidade.domain.repository.PasswordResetTokenRepository;
@@ -24,6 +23,9 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class PasswordResetService {
 
+    private static final String MENSAGEM_RECUPERACAO =
+            "Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha em poucos minutos.";
+
     private final UsuarioRepository usuarioRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,16 +40,12 @@ public class PasswordResetService {
     @Transactional
     public RecuperacaoSenhaResponseDTO solicitarRecuperacao(SolicitarRecuperacaoSenhaRequestDTO request) {
         String email = request.email().trim().toLowerCase();
-        
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado: " + email));
 
-        if (usuario.getDeletadoEm() != null) {
-            throw new BusinessException("Conta desativada: " + email);
-        }
-
-        if (usuario.getStatus() != br.com.vet.identidade.domain.enums.StatusUsuario.ATIVO) {
-            throw new BusinessException("Conta não está ativa: " + email);
+        Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+        if (usuario == null
+                || usuario.getDeletadoEm() != null
+                || usuario.getStatus() != br.com.vet.identidade.domain.enums.StatusUsuario.ATIVO) {
+            return new RecuperacaoSenhaResponseDTO(MENSAGEM_RECUPERACAO);
         }
 
         // Invalidar tokens anteriores não usados
@@ -63,9 +61,7 @@ public class PasswordResetService {
         // Enviar e-mail
         emailService.enviarLinkRedefinicaoSenha(usuario.getEmail(), token);
 
-        return new RecuperacaoSenhaResponseDTO(
-                "Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha em poucos minutos."
-        );
+        return new RecuperacaoSenhaResponseDTO(MENSAGEM_RECUPERACAO);
     }
 
     @Transactional
