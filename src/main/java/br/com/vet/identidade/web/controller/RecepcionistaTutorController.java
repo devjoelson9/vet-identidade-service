@@ -1,5 +1,6 @@
 package br.com.vet.identidade.web.controller;
 
+import br.com.vet.identidade.application.dto.request.AtualizarTutorRecepcionistaRequestDTO;
 import br.com.vet.identidade.application.dto.request.RecepcionistaTutorRequestDTO;
 import br.com.vet.identidade.application.dto.response.TutorResponseDTO;
 import br.com.vet.identidade.application.service.RecepcionistaTutorService;
@@ -43,7 +44,7 @@ public class RecepcionistaTutorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TutorResponseDTO> atualizar(@PathVariable Long id, @Valid @RequestBody RecepcionistaTutorRequestDTO request) {
+    public ResponseEntity<TutorResponseDTO> atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarTutorRecepcionistaRequestDTO request) {
         return ResponseEntity.ok(service.atualizar(id, request));
     }
 

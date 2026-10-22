@@ -1,5 +1,6 @@
 package br.com.vet.identidade.application.service;
 
+import br.com.vet.identidade.application.dto.request.AtualizarTutorRecepcionistaRequestDTO;
 import br.com.vet.identidade.application.dto.request.RecepcionistaTutorRequestDTO;
 import br.com.vet.identidade.application.dto.response.TutorResponseDTO;
 import br.com.vet.identidade.application.exception.CpfAlreadyExistsException;
@@ -80,7 +81,7 @@ public class RecepcionistaTutorService {
     }
 
     @Transactional
-    public TutorResponseDTO atualizar(Long id, RecepcionistaTutorRequestDTO request) {
+    public TutorResponseDTO atualizar(Long id, AtualizarTutorRecepcionistaRequestDTO request) {
         Tutor tutor = tutorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutor não encontrado: " + id));
 
