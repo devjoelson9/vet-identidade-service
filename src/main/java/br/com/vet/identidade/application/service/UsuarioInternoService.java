@@ -67,13 +67,13 @@ public class UsuarioInternoService {
     public Page<UsuarioInternoResponse> listar(Role role, StatusUsuario status, Pageable pageable) {
         Page<Usuario> usuarios;
         if (role != null && status != null) {
-            usuarios = usuarioRepository.findByRoleAndStatusAndDeletadoEmIsNull(role, status, pageable);
+            usuarios = usuarioRepository.findByRoleAndStatusAndDeletadoEmIsNull(role, status, Role.TUTOR, pageable);
         } else if (role != null) {
-            usuarios = usuarioRepository.findByRoleAndDeletadoEmIsNull(role, pageable);
+            usuarios = usuarioRepository.findByRoleAndDeletadoEmIsNull(role, Role.TUTOR, pageable);
         } else if (status != null) {
-            usuarios = usuarioRepository.findByStatusAndDeletadoEmIsNull(status, pageable);
+            usuarios = usuarioRepository.findByStatusAndDeletadoEmIsNull(status, Role.TUTOR, pageable);
         } else {
-            usuarios = usuarioRepository.findByDeletadoEmIsNull(pageable);
+            usuarios = usuarioRepository.findByDeletadoEmIsNull(Role.TUTOR, pageable);
         }
         return usuarios.map(u -> mapper.toResponse(u, veterinarioRepository.findByUsuarioId(u.getId())));
     }
@@ -84,7 +84,7 @@ public class UsuarioInternoService {
                 .filter(u -> u.getDeletadoEm() == null)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado: " + id));
 
-        if (usuario.getRoles().contains(Role.TUTOR) || usuario.getRoles().contains(Role.ADMIN)) {
+        if (usuario.getRoles().contains(Role.TUTOR)) {
             throw new ResourceNotFoundException("Usuário não encontrado: " + id);
         }
 
@@ -97,7 +97,7 @@ public class UsuarioInternoService {
                 .filter(u -> u.getDeletadoEm() == null)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado: " + id));
 
-        if (usuario.getRoles().contains(Role.TUTOR) || usuario.getRoles().contains(Role.ADMIN)) {
+        if (usuario.getRoles().contains(Role.TUTOR)) {
             throw new ResourceNotFoundException("Usuário não encontrado: " + id);
         }
 
