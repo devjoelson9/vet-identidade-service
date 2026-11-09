@@ -32,12 +32,13 @@ public class JwtTokenProvider {
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
 
-    public String generateAccessToken(String email, Set<Role> roles) {
+    public String generateAccessToken(String email, Long usuarioId, Set<Role> roles) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .subject(email)
                 .claim("type", "access")
+                .claim("usuarioId", usuarioId)
                 .claim("roles", roles.stream().map(Role::name).collect(Collectors.toSet()))
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(accessTokenExpirationMs)))

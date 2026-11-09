@@ -33,7 +33,7 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByEmail(request.email().toLowerCase().trim())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado após autenticação"));
 
-        String accessToken = jwtTokenProvider.generateAccessToken(usuario.getEmail(), usuario.getRoles());
+        String accessToken = jwtTokenProvider.generateAccessToken(usuario.getEmail(), usuario.getId(), usuario.getRoles());
         String refreshToken = jwtTokenProvider.generateRefreshToken(usuario.getEmail());
 
         UserDto userDto = new UserDto(
@@ -64,7 +64,7 @@ public class AuthService {
 
         logoutService.revogarToken(refreshToken);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(usuario.getEmail(), usuario.getRoles());
+        String accessToken = jwtTokenProvider.generateAccessToken(usuario.getEmail(), usuario.getId(), usuario.getRoles());
         String novoRefreshToken = jwtTokenProvider.generateRefreshToken(usuario.getEmail());
 
         UserDto userDto = new UserDto(
