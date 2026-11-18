@@ -5,8 +5,11 @@ import br.com.vet.identidade.application.dto.response.LoginResponse;
 import br.com.vet.identidade.application.dto.response.UserDto;
 import br.com.vet.identidade.application.exception.BusinessException;
 import br.com.vet.identidade.domain.enums.StatusUsuario;
+import br.com.vet.identidade.domain.enums.Role;
 import br.com.vet.identidade.domain.model.Usuario;
+import br.com.vet.identidade.domain.model.Veterinario;
 import br.com.vet.identidade.domain.repository.UsuarioRepository;
+import br.com.vet.identidade.domain.repository.VeterinarioRepository;
 import br.com.vet.identidade.infrastructure.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +24,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
+    private final VeterinarioRepository veterinarioRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final LogoutService logoutService;
 
@@ -36,15 +40,7 @@ public class AuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(usuario.getEmail(), usuario.getId(), usuario.getRoles());
         String refreshToken = jwtTokenProvider.generateRefreshToken(usuario.getEmail());
 
-        UserDto userDto = new UserDto(
-                usuario.getId(),
-                usuario.getNomeCompleto(),
-                usuario.getEmail(),
-                usuario.getRoles(),
-                usuario.getStatus().name()
-        );
-
-        return new LoginResponse(accessToken, refreshToken, userDto);
+        return new LoginResponse(accessToken, refreshToken, toUserDto(usuario));
     }
 
     @Transactional
@@ -67,14 +63,33 @@ public class AuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(usuario.getEmail(), usuario.getId(), usuario.getRoles());
         String novoRefreshToken = jwtTokenProvider.generateRefreshToken(usuario.getEmail());
 
-        UserDto userDto = new UserDto(
+        return new LoginResponse(accessToken, novoRefreshToken, toUserDto(usuario));
+    }
+
+    private UserDto toUserDto(Usuario usuario) {
+        Long veterinarioId = null;
+        String crmv = null;
+        String especialidade = null;
+
+        if (usuario.getRoles().contains(Role.VETERINARIO)) {
+            Veterinario veterinario = veterinarioRepository.findByUsuarioId(usuario.getId()).orElse(null);
+            if (veterinario != null) {
+                veterinarioId = veterinario.getId();
+                crmv = veterinario.getCrmv();
+                especialidade = veterinario.getEspecialidade();
+            }
+        }
+
+        return new UserDto(
                 usuario.getId(),
+                veterinarioId,
                 usuario.getNomeCompleto(),
                 usuario.getEmail(),
                 usuario.getRoles(),
-                usuario.getStatus().name()
+                usuario.getStatus().name(),
+                usuario.getTelefone(),
+                crmv,
+                especialidade
         );
-
-        return new LoginResponse(accessToken, novoRefreshToken, userDto);
     }
 }

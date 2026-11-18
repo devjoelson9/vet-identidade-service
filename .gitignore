@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 .env
+
+# Anotacoes locais (nao versionar)
+/plano-impementacao.md

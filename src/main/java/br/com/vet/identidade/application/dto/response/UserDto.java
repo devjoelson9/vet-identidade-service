@@ -6,9 +6,13 @@ import java.util.Set;
 
 public record UserDto(
         Long id,
+        Long veterinarioId,
         String nomeCompleto,
         String email,
         Set<Role> roles,
-        String status
+        String status,
+        String telefone,
+        String crmv,
+        String especialidade
 ) {
 }
