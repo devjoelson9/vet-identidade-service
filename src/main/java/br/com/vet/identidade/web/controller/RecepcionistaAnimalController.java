@@ -30,6 +30,7 @@ public class RecepcionistaAnimalController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'ADMIN')")
     public ResponseEntity<Page<AnimalResponseDTO>> listar(
             @PathVariable Long tutorId,
             @PageableDefault(size = 20, sort = "nome") Pageable pageable
@@ -38,6 +39,7 @@ public class RecepcionistaAnimalController {
     }
 
     @GetMapping("/{animalId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'ADMIN')")
     public ResponseEntity<AnimalResponseDTO> buscar(
             @PathVariable Long tutorId,
             @PathVariable Long animalId

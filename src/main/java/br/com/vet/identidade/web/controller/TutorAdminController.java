@@ -2,7 +2,11 @@ package br.com.vet.identidade.web.controller;
 
 import br.com.vet.identidade.application.dto.response.TutorResponseDTO;
 import br.com.vet.identidade.application.service.TutorAdminService;
+import br.com.vet.identidade.domain.enums.StatusUsuario;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +18,15 @@ import org.springframework.web.bind.annotation.*;
 public class TutorAdminController {
 
     private final TutorAdminService service;
+
+    @GetMapping
+    public ResponseEntity<Page<TutorResponseDTO>> listar(
+            @RequestParam(required = false) String termo,
+            @RequestParam(required = false) StatusUsuario status,
+            @PageableDefault(size = 20, sort = "id") Pageable pageable
+    ) {
+        return ResponseEntity.ok(service.listar(termo, status, pageable));
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativar(@PathVariable Long id) {

@@ -56,6 +56,12 @@ public class UsuarioInternoMapper {
         if (request.nomeCompleto() != null && !request.nomeCompleto().isBlank()) {
             usuario.setNomeCompleto(request.nomeCompleto());
         }
+        if (request.getCpfLimpo() != null && !request.getCpfLimpo().isBlank()) {
+            usuario.setCpf(request.getCpfLimpo());
+        }
+        if (request.getEmailNormalizado() != null && !request.getEmailNormalizado().isBlank()) {
+            usuario.setEmail(request.getEmailNormalizado());
+        }
         if (request.dataNascimento() != null) {
             usuario.setDataNascimento(request.dataNascimento());
         }

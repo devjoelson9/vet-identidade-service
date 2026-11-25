@@ -2,6 +2,8 @@ package br.com.vet.identidade.web.handler;
 
 import br.com.vet.identidade.application.dto.response.ApiErrorResponse;
 import br.com.vet.identidade.application.exception.BusinessException;
+import br.com.vet.identidade.application.exception.CpfAlreadyExistsException;
+import br.com.vet.identidade.application.exception.CrmvAlreadyExistsException;
 import br.com.vet.identidade.application.exception.EmailAlreadyExistsException;
 import br.com.vet.identidade.application.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +51,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ApiErrorResponse> handleEmailExists(EmailAlreadyExistsException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(CpfAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleCpfExists(CpfAlreadyExistsException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(CrmvAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleCrmvExists(CrmvAlreadyExistsException ex, HttpServletRequest request) {
         return buildError(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
     }
 

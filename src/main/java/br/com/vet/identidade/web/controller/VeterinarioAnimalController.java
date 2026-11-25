@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/veterinario/animais")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('VETERINARIO')")
+@PreAuthorize("hasAnyRole('VETERINARIO', 'ADMIN')")
 public class VeterinarioAnimalController {
 
     private final VeterinarioAnimalService service;
