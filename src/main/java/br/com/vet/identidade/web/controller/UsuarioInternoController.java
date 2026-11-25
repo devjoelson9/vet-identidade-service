@@ -7,6 +7,7 @@ import br.com.vet.identidade.application.service.UsuarioInternoService;
 import br.com.vet.identidade.domain.enums.Role;
 import br.com.vet.identidade.domain.enums.StatusUsuario;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +53,7 @@ public class UsuarioInternoController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<UsuarioInternoResponse> alterarStatus(@PathVariable Long id, @RequestBody StatusRequest request) {
+    public ResponseEntity<UsuarioInternoResponse> alterarStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
         UsuarioInternoResponse response = service.alterarStatus(id, request.status());
         return ResponseEntity.ok(response);
     }
@@ -63,5 +64,5 @@ public class UsuarioInternoController {
         return ResponseEntity.noContent().build();
     }
 
-    public record StatusRequest(StatusUsuario status) {}
+    public record StatusRequest(@NotNull(message = "Situação é obrigatória") StatusUsuario status) {}
 }
